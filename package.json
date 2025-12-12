@@ -1,0 +1,33 @@
+{
+  "name": "tanstack-direct-writes-issue",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Toba-bonjour/Tanstack-Direct-Writes-Issue.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Toba-bonjour/Tanstack-Direct-Writes-Issue/issues"
+  },
+  "homepage": "https://github.com/Toba-bonjour/Tanstack-Direct-Writes-Issue#readme",
+  "dependencies": {
+    "@tanstack/offline-transactions": "^1.0.1",
+    "@tanstack/query-db-collection": "^1.0.6",
+    "@tanstack/react-db": "^0.1.55",
+    "@tanstack/react-query": "^5.90.12",
+    "@vitejs/plugin-react": "^5.1.2",
+    "react": "19.1",
+    "react-dom": "19.1",
+    "vite": "^7.2.7",
+    "zod": "^4.1.13"
+  }
+}
