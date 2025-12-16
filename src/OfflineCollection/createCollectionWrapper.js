@@ -1,10 +1,11 @@
-import { createCollection as createCollectionDb } from '@tanstack/react-db';
+import { createCollection } from '@tanstack/react-db';
 import { queryCollectionOptions } from '@tanstack/query-db-collection';
 import { createApplyWrite } from "./createApplyWrite";
 import { createCollectionMutationPersiter } from "./createMutationPerister";
 import { createMutationsMap } from "./createMutationsMap";
 
-export function createCollection(config) {
+
+export function createCollectionWrapper(config) {
     const {
         name,
         queryClient,
@@ -49,7 +50,7 @@ export function createCollection(config) {
         throw new Error('deleteOne endpoint is missing');
     }
 
-    const collection = createCollectionDb(
+    const collection = createCollection(
         queryCollectionOptions({
             queryFn: queries.findMany,
             syncMode,

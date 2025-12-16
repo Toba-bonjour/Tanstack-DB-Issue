@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { startOfflineExecutor } from '@tanstack/offline-transactions';
-import { createCollection } from './OfflineCollection/createCollection';
+import { createCollectionWrapper } from './OfflineCollection/createCollectionWrapper';
 import { createActions } from './OfflineCollection/createActions';
 import { createOfflineMutationPersiter } from './OfflineCollection/createMutationPerister';
 import { addOneTodo, findManyTodos, updateOneTodo, deleteOneTodo } from './OfflineCollection/api';
@@ -26,7 +26,7 @@ const {
   mutationsMap,
   applyWrite,
 
-} = createCollection({
+} = createCollectionWrapper({
   name: 'todos',
   queryClient,
   schema: todoSchema,
