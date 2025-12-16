@@ -1,5 +1,8 @@
 import { capitaliseString } from "./utils";
 
+
+// Convenient factory function that create a set of actions based on the persisters definition.
+// onInsert, onUpdate and onDelete can have the values: 'online' | 'optimistic' | 'offline'.
 export function createActions({
     name,
     onInsert,
@@ -8,7 +11,6 @@ export function createActions({
     collection,
     offlineExecutor
 }) {
-
 
     const mutationFnName = `sync${capitaliseString(name)}`;
     const actions = {};
