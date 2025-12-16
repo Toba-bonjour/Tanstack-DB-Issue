@@ -1,5 +1,3 @@
-
-
 export function createMutationsMap(mutationsApi){
     return {
         insert: (m, idempotencyKey) => {
