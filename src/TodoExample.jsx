@@ -9,17 +9,26 @@ import {
 
 function TodoList() {
   const [newTodoTitle, setNewTodoTitle] = useState('');
+  const [filterUserId, setFilterUserId] = useState(1);
 
-  const { data: todos = [], isLoading, isError, error } = useLiveQuery((q) =>
+  const { data: allTodos = [], isLoading, isError, error } = useLiveQuery((q) =>
     q.from({ todos: todoCollection })
   );
+
+  // Filter todos by userId (JSONPlaceholder has 200 todos across 10 users)
+  const todos = allTodos.filter(todo => todo.userId === filterUserId);
 
   const handleAddTodo = () => {
     if (!newTodoTitle.trim()) return;
 
     todoActions.addOne({
+      data: {
+        id: Date.now(),
+        userId: filterUserId,
         title: newTodoTitle,
         completed: false
+      },
+      metadata: 'hello'
     });
 
     setNewTodoTitle('');
@@ -27,13 +36,18 @@ function TodoList() {
 
   const handleToggleTodo = (id, completed) => {
     todoActions.updateOne({
-      id,
+      key: id,
       changes: { completed: !completed }
     });
   };
 
-  const handleDeleteTodo = (id) => {
-    todoActions.deleteOne({ id });
+  const handleDeleteTodo = (key) => {
+    const metadata = { hannnn: 'oui'}
+    console.log('key', key)
+    todoActions.deleteOne({ 
+      key, 
+      metadata 
+    });
   };
 
 
@@ -42,9 +56,30 @@ function TodoList() {
       <h1>Todo List</h1>
 
       <div style={{ marginBottom: '20px' }}>
-          <button onClick={todoCollection.utils.refetch} style={{ padding: '8px 16px' }}>
-          refetch
+        <button onClick={todoCollection.utils.refetch} style={{ padding: '8px 16px' }}>
+          Refetch
         </button>
+
+        <div style={{ marginTop: '16px' }}>
+          <label style={{ marginRight: '8px', fontWeight: 'bold' }}>
+            Filter by User ID:
+          </label>
+          <select
+            value={filterUserId}
+            onChange={(e) => setFilterUserId(Number(e.target.value))}
+            style={{ padding: '4px 8px', fontSize: '14px' }}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(id => (
+              <option key={id} value={id}>User {id}</option>
+            ))}
+          </select>
+          <span style={{ marginLeft: '8px', color: '#666' }}>
+            ({todos.length} todos)
+          </span>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
         <h2>Add todo</h2>
         <input
           type="text"

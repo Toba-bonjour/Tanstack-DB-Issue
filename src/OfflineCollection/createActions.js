@@ -1,4 +1,4 @@
-import { capitaliseString, checkMetadata } from "./utils";
+import { capitaliseString } from "./utils";
 
 export function createActions({
     name,
@@ -9,19 +9,18 @@ export function createActions({
     offlineExecutor
 }) {
 
-    console.log('creating actions : ', { onInsert, onUpdate, onDelete })
 
     const mutationFnName = `sync${capitaliseString(name)}`;
     const actions = {};
 
     if (onInsert === 'online') {
-        actions.addOne = ( data, metadata ) => {
+        actions.addOne = ({ data, metadata = {} }) => {
 
             const tx = collection.insert(
                 data,
                 {
                     optimistic: false,
-                    metadata: { context: 'online', ...metadata }
+                    metadata: { metadata }
                 }
             );
             return tx.isPersisted.promise;
@@ -29,20 +28,20 @@ export function createActions({
 
 
     } else if (onInsert === 'optimistic') {
-        actions.addOne = ( data, metadata ) => {
+        actions.addOne = ({ data, metadata = {} }) => {
 
             const tx = collection.insert(
                 data,
                 {
                     optimistic: true,
-                    metadata: { context: 'optimistic', ...metadata }
+                    metadata: { metadata }
                 }
             );
             return tx;
         };
 
     } else if (onInsert === 'offline') {
-        actions.addOne = ( data, metadata ) => {
+        actions.addOne = ({ data, metadata = {} }) => {
 
             const tx = offlineExecutor.createOfflineTransaction({
                 mutationFnName,
@@ -51,56 +50,49 @@ export function createActions({
 
             tx.mutate(() => collection.insert(
                 data,
-                { metadata: { context: 'offline', ...metadata } }
+                { metadata }
             ));
+
             return tx;
         };
     }
 
     // Update actions
     if (onUpdate === 'online') {
-        actions.updateOne = ({ id, changes, metadata } = {}) => {
-            checkMetadata(metadata);
+        actions.updateOne = ({ key, changes, metadata = {} }) => {
+
             const tx = collection.update(
-                id,
-                {
-                    optimistic: false,
-                    metadata: { context: 'online', ...metadata }
-                },
+                key,
+                { optimistic: false, metadata: { metadata } },
                 (draft) => Object.assign(draft, changes)
             );
             return tx.isPersisted.promise;
         };
 
     } else if (onUpdate === 'optimistic') {
-        actions.updateOne = ({ id, changes, metadata } = {}) => {
-            checkMetadata(metadata);
+        actions.updateOne = ({ key, changes, metadata = {} }) => {
+ 
             const tx = collection.update(
-                id,
-                {
-                    optimistic: true,
-                    metadata: { context: 'optimistic', ...metadata }
-                },
+                key,
+                { optimistic: true, metadata: { metadata } },
                 (draft) => Object.assign(draft, changes)
-                
+
             );
             return tx;
         };
 
     } else if (onUpdate === 'offline') {
-        actions.updateOne = ({ id, changes, metadata } = {}) => {
-            console.log({ id, changes, metadata })
+        actions.updateOne = ({ key, changes, metadata = {} }) => {
 
-            checkMetadata(metadata);
             const tx = offlineExecutor.createOfflineTransaction({
                 mutationFnName,
                 autoCommit: true
             });
+
             tx.mutate(() => collection.update(
-                id,
-                { metadata: { context: 'offline', ...metadata } },
+                key,
+                { metadata },
                 (draft) => Object.assign(draft, changes)
-                
             ));
             return tx;
         };
@@ -108,43 +100,41 @@ export function createActions({
 
     // Delete actions
     if (onDelete === 'online') {
-        actions.deleteOne = ({ id, metadata } = {}) => {
-            checkMetadata(metadata);
+        actions.deleteOne = ({ key, metadata = {} }) => {
+
             const tx = collection.delete(
-                id,
+                key,
                 {
                     optimistic: false,
-                    metadata: { context: 'online', ...metadata }
+                    metadata: { metadata }
                 }
             );
             return tx.isPersisted.promise;
         };
 
     } else if (onDelete === 'optimistic') {
-        actions.deleteOne = ({ id, metadata } = {}) => {
-            checkMetadata(metadata);
+        actions.deleteOne = ({ key, metadata = {} }) => {
+
             const tx = collection.delete(
-                id,
+                key,
                 {
                     optimistic: true,
-                    metadata: { context: 'optimistic', ...metadata }
+                    metadata: { metadata }
                 }
             );
             return tx;
         };
 
     } else if (onDelete === 'offline') {
-        actions.deleteOne = ({ id, metadata } = {}) => {
-            checkMetadata(metadata);
+        actions.deleteOne = ({ key, metadata = {} }) => { 
+
             const tx = offlineExecutor.createOfflineTransaction({
                 mutationFnName,
                 autoCommit: true
             });
             tx.mutate(() => collection.delete(
-                id,
-                {
-                    metadata: { context: 'offline', ...metadata }
-                }
+                key,
+                { metadata }
             ));
             return tx;
         };

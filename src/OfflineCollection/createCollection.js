@@ -63,7 +63,7 @@ export function createCollection(config) {
             gcTime,
             startSync: true,
             enable: true,
-            select: (response) => response?.data || [],
+            select: (response) => response?.data,
             onInsert: mutationPersister,
             onUpdate: mutationPersister,
             onDelete: mutationPersister

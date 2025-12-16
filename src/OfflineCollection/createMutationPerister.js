@@ -1,4 +1,4 @@
-// Factory function to create a persister ONLY for the collection
+// Factory function to create a persister for the collection
 export function createCollectionMutationPersiter(mutationsMap, applyWrite) {
     return async ({ transaction, collection }) => {
         await transactionCore({ transaction, collection, mutationsMap, applyWrite });
@@ -9,26 +9,25 @@ export function createCollectionMutationPersiter(mutationsMap, applyWrite) {
 // Factory function to create a persister for the offline executor 
 // (consumed through mutationFns)
 export function createOfflineMutationPersiter(mutationsMap, collection, applyWrite) {
-    return async ({ transaction }) => {
-        await transactionCore({ transaction, collection, mutationsMap, applyWrite });
+    return async ({ transaction, idempotencyKey }) => {
+        await transactionCore({ transaction, collection, mutationsMap, applyWrite, idempotencyKey });
     }
 }
 
-
-async function transactionCore({ transaction, collection, mutationsMap, applyWrite }){
-    for (const mutation of transaction.mutations) {
-        const { mutationType, response } = await executeMutation({mutation, mutationsMap});
-        applyWrite({ mutationType, response, collection });
-    }
+async function transactionCore({ transaction, collection, mutationsMap, applyWrite, idempotencyKey }){
+    const responses = [];
+    for (const mutation of transaction.mutations){
+        const response = await executeMutation({mutation, mutationsMap, idempotencyKey});
+        // pushes { mutationType, response }
+        responses.push(response);
+    };
+    applyWrite({ responses, collection });   
 }
 
-async function executeMutation({ mutation, mutationsMap}) {
+async function executeMutation({ mutation, mutationsMap, idempotencyKey}) {
     const mutationType = mutation.type;
-    const context = mutation.metadata?.context;
-    console.log('executeMutation', { mutationType, context })
-
     const mutationFn = mutationsMap[mutationType];
-    const response = await mutationFn(mutation);
+    const response = await mutationFn(mutation, idempotencyKey);
     return { mutationType, response };
 }
 

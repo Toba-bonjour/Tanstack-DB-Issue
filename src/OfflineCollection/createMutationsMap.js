@@ -1,27 +1,30 @@
 
 
-
-export function createMutationsMap(mutations){
+export function createMutationsMap(mutationsApi){
     return {
-        insert: (m) => {
-            return mutations.addOne(m.modified)
-        },
-        update: (m) => {
-            return mutations.updateOne({
-                id: m.key,
-                changes: m.changes
+        insert: (m, idempotencyKey) => {
+
+            return mutationsApi.addOne({
+                data: m.modified,
+                metadata: m.metadata,
+                idempotencyKey
             })
         },
-        delete: (m) => {
 
-            // clean context property
-            if (m.metadata?.context) {
-                delete m.metadata.context;
-            }
+        update: (m, idempotencyKey) => {
+            return mutationsApi.updateOne({
+                key: m.key,
+                changes: m.changes,
+                idempotencyKey,
+                metadata: m.metadata,
+            })
+        },
 
-            return mutations.deleteOne({
-                id: m.key,
-                metadata: m.metadata
+        delete: (m, idempotencyKey) => {
+            return mutationsApi.deleteOne({
+                key: m.key,
+                metadata: m.metadata,
+                idempotencyKey
             })
         }
     };
