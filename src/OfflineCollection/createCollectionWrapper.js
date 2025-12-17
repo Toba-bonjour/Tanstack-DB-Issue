@@ -52,6 +52,7 @@ export function createCollectionWrapper(config) {
 
     const collection = createCollection(
         queryCollectionOptions({
+            id: name,
             queryFn: queries.findMany,
             syncMode,
             queryClient,

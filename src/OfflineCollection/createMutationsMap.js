@@ -1,7 +1,6 @@
 export function createMutationsMap(mutationsApi){
     return {
         insert: (m, idempotencyKey) => {
-
             return mutationsApi.addOne({
                 data: m.modified,
                 metadata: m.metadata,

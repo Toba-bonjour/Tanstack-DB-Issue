@@ -6,6 +6,12 @@ import { createOfflineMutationPersiter } from './OfflineCollection/createMutatio
 import { addOneTodo, findManyTodos, updateOneTodo, deleteOneTodo } from './OfflineCollection/api';
 import { z } from 'zod';
 
+const persiterConfig = {
+  onInsert: 'offline',
+  onUpdate: 'offline',
+  onDelete: 'offline', 
+}
+
 const queryClient = new QueryClient();
 
 const todoSchema = z.object({
@@ -14,12 +20,6 @@ const todoSchema = z.object({
   title: z.string().default(''),
   completed: z.boolean().default(false),
 });
-
-const persiterConfig = {
-  onInsert: 'offline',
-  onUpdate: 'offline',
-  onDelete: 'offline', 
-}
 
 const {
   collection,
@@ -49,7 +49,7 @@ const syncTodos = createOfflineMutationPersiter(
     applyWrite,
 );
 
-const offlineExecutor = startOfflineExecutor({
+export const offlineExecutor = startOfflineExecutor({
   collections: {
     todos: collection
   },

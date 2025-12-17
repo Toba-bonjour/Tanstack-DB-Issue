@@ -5,6 +5,7 @@ import {
   queryClient,
   todoCollection,
   todoActions,
+  offlineExecutor,
 } from './example-usage';
 
 function TodoList() {
@@ -50,6 +51,10 @@ function TodoList() {
     });
   };
 
+  const handlePeekOutbox = () => {
+    const peek = offlineExecutor.peekOutbox();
+    console.log(peek);
+  }
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
@@ -58,6 +63,10 @@ function TodoList() {
       <div style={{ marginBottom: '20px' }}>
         <button onClick={todoCollection.utils.refetch} style={{ padding: '8px 16px' }}>
           Refetch
+        </button>
+
+        <button onClick={handlePeekOutbox} style={{ padding: '8px 16px' }}>
+          peekOutbox
         </button>
 
         <div style={{ marginTop: '16px' }}>

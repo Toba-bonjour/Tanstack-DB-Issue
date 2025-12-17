@@ -17,7 +17,7 @@ export function createActions({
 
     if (onInsert === 'online') {
         actions.addOne = ({ data, metadata = {} }) => {
-
+            console.log('Using onInsert online action');
             const tx = collection.insert(
                 data,
                 {
@@ -31,7 +31,7 @@ export function createActions({
 
     } else if (onInsert === 'optimistic') {
         actions.addOne = ({ data, metadata = {} }) => {
-
+            console.log('Using onInsert optimistic action');
             const tx = collection.insert(
                 data,
                 {
@@ -44,7 +44,7 @@ export function createActions({
 
     } else if (onInsert === 'offline') {
         actions.addOne = ({ data, metadata = {} }) => {
-
+            console.log('Using onInsert offline action');
             const tx = offlineExecutor.createOfflineTransaction({
                 mutationFnName,
                 autoCommit: true
@@ -62,7 +62,7 @@ export function createActions({
     // Update actions
     if (onUpdate === 'online') {
         actions.updateOne = ({ key, changes, metadata = {} }) => {
-
+            console.log('Using onUpdate online action');
             const tx = collection.update(
                 key,
                 { optimistic: false, metadata: { metadata } },
@@ -73,7 +73,7 @@ export function createActions({
 
     } else if (onUpdate === 'optimistic') {
         actions.updateOne = ({ key, changes, metadata = {} }) => {
- 
+            console.log('Using onUpdate optimistic action');
             const tx = collection.update(
                 key,
                 { optimistic: true, metadata: { metadata } },
@@ -85,7 +85,7 @@ export function createActions({
 
     } else if (onUpdate === 'offline') {
         actions.updateOne = ({ key, changes, metadata = {} }) => {
-
+            console.log('Using onUpdate offline action');
             const tx = offlineExecutor.createOfflineTransaction({
                 mutationFnName,
                 autoCommit: true
@@ -102,6 +102,7 @@ export function createActions({
 
     // Delete actions
     if (onDelete === 'online') {
+        console.log('Using onDelete online action');
         actions.deleteOne = ({ key, metadata = {} }) => {
 
             const tx = collection.delete(
@@ -115,6 +116,7 @@ export function createActions({
         };
 
     } else if (onDelete === 'optimistic') {
+        console.log('Using onDelete optimistic action');
         actions.deleteOne = ({ key, metadata = {} }) => {
 
             const tx = collection.delete(
@@ -128,8 +130,9 @@ export function createActions({
         };
 
     } else if (onDelete === 'offline') {
+        
         actions.deleteOne = ({ key, metadata = {} }) => { 
-
+            console.log('Using onDelete offline action');
             const tx = offlineExecutor.createOfflineTransaction({
                 mutationFnName,
                 autoCommit: true
