@@ -69,15 +69,28 @@ export const updateOneTodo = async ({ key, changes, metadata,  idempotencyKey}) 
 };
 
 
+// Keep track of deleted todo keys
+const deletedTodoKeys = new Set();
+
 // jsonplaceholder.typicode.com does not return any data for DELETE endpoint.
 // The incoming key is manually returned for collection.utils.writeDelete(key).
 export const deleteOneTodo = async ({ key, metadata,  idempotencyKey}) => {
+  console.log('calling deleteOneTodo', { key, metadata,  idempotencyKey})
+
+  // Check if this key was already deleted
+  if (deletedTodoKeys.has(key)) {
+    throw new Error(`Failed to delete todo: Not Found (404)`);
+  }
+
   const response = await fetch(`${API_URL}/todos/${key}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
     throw new Error(`Failed to delete todo: ${response.statusText}`);
   }
+
+  // Add the key to the deleted set
+  deletedTodoKeys.add(key);
 
   const result = {
     success: true,

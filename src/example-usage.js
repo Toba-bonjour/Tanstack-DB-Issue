@@ -1,10 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
-import { startOfflineExecutor } from '@tanstack/offline-transactions';
+import { startOfflineExecutor, LocalStorageAdapter } from '@tanstack/offline-transactions';
 import { createCollectionWrapper } from './OfflineCollection/createCollectionWrapper';
 import { createActions } from './OfflineCollection/createActions';
 import { createOfflineMutationPersiter } from './OfflineCollection/createMutationPerister';
 import { addOneTodo, findManyTodos, updateOneTodo, deleteOneTodo } from './OfflineCollection/api';
 import { z } from 'zod';
+import { createConsolidateTransactions } from './OfflineCollection/mergePendingMutations';
+
 
 const persiterConfig = {
   onInsert: 'offline',
@@ -49,6 +51,8 @@ const syncTodos = createOfflineMutationPersiter(
     applyWrite,
 );
 
+const consolidateTransactions = createConsolidateTransactions(collection);
+
 export const offlineExecutor = startOfflineExecutor({
   collections: {
     todos: collection
@@ -56,6 +60,8 @@ export const offlineExecutor = startOfflineExecutor({
   mutationFns: {
     syncTodos,
   },
+  storage: new LocalStorageAdapter(`offline-transaction`),
+  beforeRetry: consolidateTransactions,
   onLeadershipChange: (isLeader) => {
     if (!isLeader) {
       console.info('Running in online-only mode (another tab is the leader)');

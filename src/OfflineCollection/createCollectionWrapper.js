@@ -68,7 +68,7 @@ export function createCollectionWrapper(config) {
             select: (response) => response?.data,
             onInsert: mutationPersister,
             onUpdate: mutationPersister,
-            onDelete: mutationPersister
+            //onDelete: mutationPersister
         })
     );
 

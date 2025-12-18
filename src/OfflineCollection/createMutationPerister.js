@@ -1,3 +1,5 @@
+import { NonRetriableError } from '@tanstack/offline-transactions'
+
 // Factory function to create a persister for the collection
 export function createCollectionMutationPersiter(mutationsMap, applyWrite) {
     return async ({ transaction, collection }) => {
@@ -11,15 +13,24 @@ export function createCollectionMutationPersiter(mutationsMap, applyWrite) {
 export function createOfflineMutationPersiter(mutationsMap, collection, applyWrite) {
     return async ({ transaction, idempotencyKey }) => {
         await transactionCore({ transaction, collection, mutationsMap, applyWrite, idempotencyKey });
+        return { refetch: false }
     }
 }
 
 async function transactionCore({ transaction, collection, mutationsMap, applyWrite, idempotencyKey }){
     const responses = [];
     for (const mutation of transaction.mutations){
-        const response = await executeMutation({mutation, mutationsMap, idempotencyKey});
-        // pushes { mutationType, response }
-        responses.push(response);
+        try {
+            const response = await executeMutation({mutation, mutationsMap, idempotencyKey});
+            // pushes { mutationType, response }
+            responses.push(response);
+
+        } catch (error) {
+            if (error.message === 'Failed to delete todo: Not Found (404)') {
+                throw new NonRetriableError('NO RETRY')
+            }
+            throw error // Will retry with backoff
+        }
     };
     applyWrite({ responses, collection });   
 }

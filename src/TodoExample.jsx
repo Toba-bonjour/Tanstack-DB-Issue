@@ -65,9 +65,9 @@ function TodoList() {
           Refetch
         </button>
 
-        <button onClick={handlePeekOutbox} style={{ padding: '8px 16px' }}>
+        {/* <button onClick={handlePeekOutbox} style={{ padding: '8px 16px' }}>
           peekOutbox
-        </button>
+        </button> */}
 
         <div style={{ marginTop: '16px' }}>
           <label style={{ marginRight: '8px', fontWeight: 'bold' }}>

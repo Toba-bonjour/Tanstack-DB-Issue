@@ -137,10 +137,9 @@ export function createActions({
                 mutationFnName,
                 autoCommit: true
             });
-            tx.mutate(() => collection.delete(
-                key,
-                { metadata }
-            ));
+            tx.mutate(() => {
+                collection.delete( key, { metadata } )
+            });
             return tx;
         };
     }
